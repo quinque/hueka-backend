@@ -62,7 +62,7 @@ if __name__ == "__main__":
 		'debug': False,
 		'elasticsearch': {
 			'index': 'hueka',
-			'uri': 'https://vpc-hueka-4px6papks3uo4ws44bn6vsoyke.eu-central-1.es.amazonaws.com',
+			'uri': 'https://localhost:9200',
 		}
 	}
 	app.debug = config['debug']
