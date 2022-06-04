@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import config
+
 import elasticsearch
 import hashlib
 import requests
@@ -11,12 +13,11 @@ from urllib.parse import urlencode
 
 application = app = Flask(__name__)
 
-
 @app.route('/<id>', methods=['GET'])
 def root_get(id):
 	try:
-		es = elasticsearch.Elasticsearch([config['elasticsearch']['uri']])
-		return es.get(index=config['elasticsearch']['index'], id=id)['_source']
+		es = elasticsearch.Elasticsearch([config.elasticsearch['uri']], verify_certs=False)
+		return es.get(index=config.elasticsearch['index'], id=id)['_source']
 	except elasticsearch.exceptions.NotFoundError:
 		return jsonify({'reason': 'Not Found'}), 404
 
@@ -29,10 +30,10 @@ def root_post():
 		id.update(('%s: (%s, %s); %s'%(data['desc'], data['lat'], data['long'], data['timestamp'])).encode())
 	except KeyError:
 		return jsonify({'reason': 'Bad Request'}), 400
-	es = elasticsearch.Elasticsearch([config['elasticsearch']['uri']])
-	es.indices.create(index=config['elasticsearch']['index'], ignore=[400])
+	es = elasticsearch.Elasticsearch([config.elasticsearch['uri']], verify_certs=False)
+	es.indices.create(index=config.elasticsearch['index'], ignore=[400])
 	es.index(
-		index=config['elasticsearch']['index'],
+		index=config.elasticsearch['index'],
 		id='0x%s' % id.hexdigest(),
 		document=data)
 	return jsonify({'id': '0x%s' % id.hexdigest()})
@@ -40,7 +41,7 @@ def root_post():
 @app.route('/ping', methods=['GET'])
 def ping():
 	try:
-		if elasticsearch.Elasticsearch([config['elasticsearch']['uri']]).ping():
+		if elasticsearch.Elasticsearch([config.elasticsearch['uri']], verify_certs=False).ping():
 			return jsonify({'result': 'pong'})
 		1/0
 	except:
@@ -48,23 +49,10 @@ def ping():
 
 @app.route('/_cat/<endpoint>', methods=['GET'])
 def _cat(endpoint=None):
-	r = requests.get('%s/_cat/%s?%s' % (config['elasticsearch']['uri'], endpoint, urlencode(request.args)))
+	r = requests.get('%s/_cat/%s?%s' % (config.elasticsearch['uri'], endpoint, urlencode(request.args)), verify=False)
 	return r.text
 
 if __name__ == "__main__":
-	config = {
-		'debug': True,
-		'elasticsearch': {
-			'index': 'hueka',
-			'uri': 'http://elasticsearch.jupiter.gdv:9200',
-		}
-	} if '-d' in sys.argv else {
-		'debug': False,
-		'elasticsearch': {
-			'index': 'hueka',
-			'uri': 'https://localhost:9200',
-		}
-	}
-	app.debug = config['debug']
+	app.debug = config.debug
 	app.run()
 

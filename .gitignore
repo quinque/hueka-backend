@@ -130,4 +130,5 @@ dmypy.json
 
 # Custom stuff
 Makefile
+config.py
 
