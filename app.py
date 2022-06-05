@@ -54,5 +54,5 @@ def _cat(endpoint=None):
 
 if __name__ == "__main__":
 	app.debug = config.debug
-	app.run()
+	app.run(**config.flask)
 
