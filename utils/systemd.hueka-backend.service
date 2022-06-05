@@ -1,0 +1,14 @@
+[Unit]
+Description=hueka-backend
+After=network-online.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+User=hueka
+WorkingDirectory=/home/hueka/backend/
+ExecStart=/home/hueka/backend/env/bin/python app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
