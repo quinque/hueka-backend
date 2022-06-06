@@ -27,8 +27,9 @@ def root_post():
 	data = request.json
 	id = hashlib.sha1()
 	try:
-		id.update(('%s: (%s, %s); %s'%(data['desc'], data['lat'], data['long'], data['timestamp'])).encode())
+		id.update(('%s: (%s, %s); %s'%(data['description'], data['latitude'], data['longitude'], data['timestamp'])).encode())
 	except KeyError:
+		print(data)
 		return jsonify({'reason': 'Bad Request'}), 400
 	es = elasticsearch.Elasticsearch([config.elasticsearch['uri']], verify_certs=False)
 	es.indices.create(index=config.elasticsearch['index'], ignore=[400])
