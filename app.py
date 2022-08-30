@@ -39,6 +39,21 @@ def root_post():
 		document=data)
 	return jsonify({'id': '0x%s' % id.hexdigest()})
 
+@app.route('/last', methods=['GET'])
+def last():
+	es = elasticsearch.Elasticsearch([config.elasticsearch['uri']], verify_certs=False)
+	response = es.search(index=config.elasticsearch['index'], body='''{
+		"query": {
+			"match_all": {}
+		},
+		"size": 1,
+		"sort": [{
+			"timestamp": {
+				"order": "desc"
+			}
+		}]}''')
+	return response['hits']['hits'][0]['_source']
+
 @app.route('/ping', methods=['GET'])
 def ping():
 	try:
