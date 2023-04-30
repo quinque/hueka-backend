@@ -5,6 +5,8 @@ import config
 
 import elasticsearch
 import hashlib
+import json
+import pyjq
 import requests
 import sys
 
@@ -41,18 +43,19 @@ def root_post():
 
 @app.route('/last', methods=['GET'])
 def last():
+	return json.dumps(_search()[0])
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+	return json.dumps(_search())
+
+def _search():
+	query = '{"query": {"match_all": {}}, "size": 1, "sort": [{"timestamp": {"order": "desc"}}]}'
+	if request.data:
+		query = request.data
 	es = elasticsearch.Elasticsearch([config.elasticsearch['uri']], verify_certs=False)
-	response = es.search(index=config.elasticsearch['index'], body='''{
-		"query": {
-			"match_all": {}
-		},
-		"size": 1,
-		"sort": [{
-			"timestamp": {
-				"order": "desc"
-			}
-		}]}''')
-	return response['hits']['hits'][0]['_source']
+	response = es.search(index=config.elasticsearch['index'], body=query)
+	return pyjq.all(".hits.hits[]._source", response)
 
 @app.route('/ping', methods=['GET'])
 def ping():
