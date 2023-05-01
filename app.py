@@ -42,16 +42,15 @@ def root_post():
 	return jsonify({'id': '0x%s' % id.hexdigest()})
 
 @app.route('/last',          methods=['GET'])
-@app.route('/last/',         methods=['GET'])
 @app.route('/last/<format>', methods=['GET'])
 def last(format=None):
 	if format == 'svg':
 		return Response('''<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><style>circle {fill: %s;}</style><circle cx="50" cy="50" r="47"/></svg>''' % (_search()[0]['naivecolor']), mimetype='image/svg+xml')
-	return json.dumps(_search()[0])
+	return Response(json.dumps(_search()[0]), mimetype='application/json')
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-	return json.dumps(_search())
+	return Response(json.dumps(_search()), mimetype='application/json')
 
 def _search():
 	query = '{"query": {"match_all": {}}, "size": 1, "sort": [{"timestamp": {"order": "desc"}}]}'
