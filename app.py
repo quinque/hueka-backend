@@ -46,7 +46,7 @@ def root_post():
 @app.route('/last/<format>', methods=['GET'])
 def last(format=None):
 	if format == 'svg':
-		return Response('''<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><style>circle {fill: %s; stroke: black; stroke-width: 1px;}</style><circle cx="50" cy="50" r="47"/></svg>''' % (_search()[0]['naivecolor']), mimetype='image/svg+xml')
+		return Response('''<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><style>circle {fill: %s;}</style><circle cx="50" cy="50" r="47"/></svg>''' % (_search()[0]['naivecolor']), mimetype='image/svg+xml')
 	return json.dumps(_search()[0])
 
 @app.route('/search', methods=['GET', 'POST'])
